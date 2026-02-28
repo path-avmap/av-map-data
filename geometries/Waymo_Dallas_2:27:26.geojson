@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"company":"Waymo","city":"Dallas","date":"2026-02-24","area_sq_mi":50},"geometry":{"type":"Polygon","coordinates":[[[-96.845,32.862],[-96.755,32.862],[-96.745,32.8],[-96.785,32.735],[-96.84,32.735],[-96.865,32.795],[-96.845,32.862]]]}}]}
