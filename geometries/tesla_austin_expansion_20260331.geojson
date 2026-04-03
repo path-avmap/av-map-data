@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"company":"Tesla","city":"Austin","event_type":"geometry_updated","date":"2026-03-31","notes":"Approximated unsupervised expansion boundary based on MoPac, US-183, and SH-71."},"geometry":{"type":"Polygon","coordinates":[[[-97.809,30.232],[-97.74,30.39],[-97.69,30.34],[-97.66,30.21],[-97.809,30.232]]]}}]}
