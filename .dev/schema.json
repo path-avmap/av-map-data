@@ -31,7 +31,8 @@
         "access_policy_changed",
         "service_model_updated",
         "platform_updated",
-        "fleet_partner_changed"
+        "fleet_partner_changed",
+        "direct_booking_updated"
       ],
       "description": "Type of event"
     },
@@ -210,6 +211,10 @@
     "fleet_partner_changed": {
       "requiredFields": ["company", "city", "fleet_partner"],
       "description": "Fleet management partner change"
+    },
+    "direct_booking_updated": {
+      "requiredFields": ["company", "city", "direct_booking"],
+      "description": "Direct booking availability change"
     }
   },
 

@@ -5,12 +5,14 @@ on:
     branches: [main, staging]
     paths:
       - 'events.csv'
+      - 'news.csv'
       - 'geometries/**'
 
   pull_request:
     branches: [main, staging]
     paths:
       - 'events.csv'
+      - 'news.csv'
       - 'geometries/**'
 
   workflow_dispatch:

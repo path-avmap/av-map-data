@@ -19,6 +19,9 @@
 import { createClient } from '@supabase/supabase-js'
 import { config } from 'dotenv'
 import { execSync } from 'child_process'
+import { readFileSync, existsSync } from 'fs'
+import { resolve, dirname } from 'path'
+import { fileURLToPath } from 'url'
 import area from '@turf/area'
 
 // Load .env file for local development (GitHub Actions sets env vars directly)
@@ -162,6 +165,47 @@ async function rebuildCache() {
     console.log('⚙️ Processing service areas...')
     const serviceAreas = buildServiceAreasFromEvents(events, geometryMap)
 
+    // STEP 3.5: Load news.csv if it exists
+    console.log('📰 Loading news data...')
+    let newsItems = []
+    try {
+      const __dirname = dirname(fileURLToPath(import.meta.url))
+      const newsPath = resolve(__dirname, '..', 'news.csv')
+      if (existsSync(newsPath)) {
+        const newsCSV = readFileSync(newsPath, 'utf-8')
+        const lines = newsCSV.trim().split('\n')
+        if (lines.length > 1) {
+          const header = lines[0].split(',')
+          for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim()
+            if (!line) continue
+            // Simple CSV parse (handles quoted fields)
+            const fields = []
+            let current = '', inQuotes = false
+            for (let j = 0; j < line.length; j++) {
+              const ch = line[j]
+              if (inQuotes) {
+                if (ch === '"' && line[j + 1] === '"') { current += '"'; j++ }
+                else if (ch === '"') { inQuotes = false }
+                else { current += ch }
+              } else {
+                if (ch === '"') { inQuotes = true }
+                else if (ch === ',') { fields.push(current); current = '' }
+                else { current += ch }
+              }
+            }
+            fields.push(current)
+            const newsItem = {}
+            header.forEach((col, idx) => { newsItem[col.trim()] = (fields[idx] || '').trim() })
+            if (newsItem.headline) newsItems.push(newsItem)
+          }
+        }
+      }
+      console.log(`   Found ${newsItems.length} news items`)
+    } catch (err) {
+      console.warn('⚠️ Failed to load news.csv:', err.message)
+    }
+
     // STEP 4: Create final data structure
     // Transform geometries to camelCase for frontend
     const geometriesForFrontend = geometriesWithData.map(geo => ({
@@ -188,6 +232,7 @@ async function rebuildCache() {
         }
       },
       events: events,
+      news: newsItems,
       geometries: geometriesForFrontend,
       service_areas: serviceAreas,
       date_range: {
