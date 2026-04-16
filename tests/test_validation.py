@@ -85,12 +85,7 @@ def test_date_format(csv_file):
 
 def test_event_types(csv_file):
     """Test that event types are valid."""
-    valid_event_types = [
-        'service_created', 'service_ended', 'geometry_updated',
-        'vehicle_types_updated', 'supervision_updated', 'fares_policy_changed',
-        'access_policy_changed', 'service_model_updated', 'platform_updated', 'fleet_partner_changed',
-        'direct_booking_updated', 'service_testing', 'service_announced'
-    ]
+    valid_event_types = get_event_types()
     errors = []
 
     with open(csv_file, 'r') as f:
