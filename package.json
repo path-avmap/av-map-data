@@ -1,5 +1,11 @@
 {
+  "type": "module",
+  "scripts": {
+    "digest": "node scripts/generate-digests.mjs",
+    "digest:backfill": "node scripts/generate-digests.mjs --backfill"
+  },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
     "csv-parse": "^6.1.0"
   }
 }

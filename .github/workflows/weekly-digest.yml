@@ -1,0 +1,56 @@
+name: Weekly AV digest
+
+# Runs every Monday at 09:00 UTC. Generates a digest for the most recent
+# completed ISO week and commits digests.json. Can also be triggered manually.
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      backfill:
+        description: "Backfill all weeks (otherwise only the latest)"
+        type: boolean
+        default: false
+      force:
+        description: "Re-generate even if cached"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: Generate digest(s)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          ARGS=""
+          if [ "${{ inputs.backfill }}" = "true" ]; then ARGS="$ARGS --backfill"; fi
+          if [ "${{ inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
+          node scripts/generate-digests.mjs $ARGS
+
+      - name: Commit digests.json
+        run: |
+          if [ -n "$(git status --porcelain digests.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add digests.json
+            git commit -m "chore: update weekly digests"
+            git push
+          else
+            echo "No digest changes to commit"
+          fi
