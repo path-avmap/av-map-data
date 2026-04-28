@@ -46,10 +46,13 @@ jobs:
         run: pytest tests/ -v
 
   # ── Job 2: Update Supabase cache ─────────────────────────────────
-  # Runs only after validation passes. Skipped on pull requests.
+  # Runs only after validation passes. Skipped on pull requests AND on
+  # forks — forks don't inherit the SUPABASE_URL / SUPABASE_SERVICE_KEY
+  # secrets, so the import would fail. Only the canonical upstream repo
+  # is allowed to write to the production / staging Supabase project.
   update-cache:
     needs: validate
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.repository == 'path-avmap/av-map-data'
     runs-on: ubuntu-latest
 
     steps:
